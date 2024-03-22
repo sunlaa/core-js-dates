@@ -111,10 +111,10 @@ function getCountDaysInMonth(month, year) {
  * '2024-02-01T00:00:00.000Z', '2024-02-12T00:00:00.000Z'  => 12
  */
 function getCountDaysOnPeriod(dateStart, dateEnd) {
-  const data1 = new Date(dateStart);
-  const data2 = new Date(dateEnd);
+  const d1 = new Date(dateStart);
+  const d2 = new Date(dateEnd);
 
-  return 1 + new Date(data2 - data1) / 1000 / 60 / 60 / 24;
+  return 1 + new Date(d2 - d1) / 1000 / 60 / 60 / 24;
 }
 
 /**
@@ -134,8 +134,14 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const d = new Date(date);
+  const start = new Date(period.start);
+  const end = new Date(period.end);
+  if (d >= start && d <= end) {
+    return true;
+  }
+  return false;
 }
 
 /**
