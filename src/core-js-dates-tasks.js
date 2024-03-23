@@ -271,8 +271,20 @@ function getNextFridayThe13th(date) {
  * Date(2024, 5, 1) => 2
  * Date(2024, 10, 10) => 4
  */
-function getQuarter(/* date */) {
-  throw new Error('Not implemented');
+function getQuarter(date) {
+  const month = date.getUTCMonth();
+
+  if (month >= 0 && month < 3) {
+    return 1;
+  }
+  if (month >= 3 && month < 6) {
+    return 2;
+  }
+  if (month >= 6 && month < 9) {
+    return 3;
+  }
+
+  return 4;
 }
 
 /**
@@ -293,8 +305,45 @@ function getQuarter(/* date */) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const createDate = (string) => {
+    const parts = string.split('-');
+    const day = +parts[0];
+    const month = +parts[1] - 1;
+    const year = +parts[2];
+
+    return new Date(year, month, day);
+  };
+
+  const start = createDate(period.start);
+  const end = createDate(period.end);
+
+  const normalize = (val) => (val >= 10 ? val : `0${val}`);
+  const getString = (date) => {
+    const d = date.getUTCDate();
+    const m = date.getUTCMonth() + 1;
+    const y = date.getUTCFullYear();
+    return `${normalize(d)}-${normalize(m)}-${y}`;
+  };
+
+  const arr = [];
+  while (start <= end) {
+    if (start >= end) {
+      arr.push(getString(start));
+      return arr;
+    }
+
+    for (let i = 0; i < countWorkDays; i += 1) {
+      arr.push(getString(start));
+      start.setUTCDate(start.getUTCDate() + 1);
+    }
+
+    for (let i = 0; i < countOffDays; i += 1) {
+      start.setUTCDate(start.getUTCDate() + 1);
+    }
+  }
+
+  return arr;
 }
 
 /**
