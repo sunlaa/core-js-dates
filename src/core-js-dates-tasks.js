@@ -62,7 +62,7 @@ function getDayName(date) {
     'Saturday',
   ];
 
-  return days[new Date(date).getDay()];
+  return days[new Date(date).getUTCDay()];
 }
 
 /**
@@ -77,8 +77,8 @@ function getDayName(date) {
  * Date('2024-02-16T00:00:00Z') => Date('2024-02-23T00:00:00Z')
  */
 function getNextFriday(date) {
-  const shift = date.getDay() === 5 ? 7 : (5 - date.getDay() + 7) % 7;
-  date.setDate(date.getDate() + shift);
+  const shift = date.getUTCDay() === 5 ? 7 : (5 - date.getUTCDay() + 7) % 7;
+  date.setUTCDate(date.getUTCDate() + shift);
   return date;
 }
 
@@ -94,7 +94,9 @@ function getNextFriday(date) {
  * 2, 2024 => 29
  */
 function getCountDaysInMonth(month, year) {
-  return new Date(year, month).getUTCDate();
+  const date = new Date(year, month);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.getUTCDate();
 }
 
 /**
@@ -184,11 +186,14 @@ function formatDate(date) {
  */
 function getCountWeekendsInMonth(month, year) {
   let count = 0;
-  const dayInMonth = new Date(year, month).getUTCDate();
+  const nextMonth = new Date(year, month);
+  nextMonth.setUTCDate(nextMonth.getUTCDate() - 1);
+  const dayInMonth = nextMonth.getUTCDate();
+
   const date = new Date(year, month - 1);
   for (let i = 1; i <= dayInMonth; i += 1) {
-    date.setDate(i);
-    const day = date.getDay();
+    date.setUTCDate(i);
+    const day = date.getUTCDay();
     if (day === 6 || day === 0) {
       count += 1;
     }
@@ -210,11 +215,20 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 1, 23) => 8
  */
 function getWeekNumberByDate(date) {
-  const firstDay = new Date(date.getFullYear(), 0, 1);
-  const msInDay = 86400000;
-  return Math.ceil(
-    ((date - firstDay) / msInDay + firstDay.getUTCDay() + 1) / 7
-  );
+  const startYear = new Date(date.getUTCFullYear(), 0, 1);
+
+  let count = 1;
+
+  while (startYear <= date) {
+    const day = startYear.getUTCDay();
+    if (day === 0) {
+      count += 1;
+    }
+
+    startYear.setUTCDate(startYear.getUTCDate() + 1);
+  }
+
+  return count;
 }
 
 /**
